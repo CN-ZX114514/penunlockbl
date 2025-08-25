@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>通用刷机工具</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #1a2a6c);
+            color: #fff;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            position: relative;
+            overflow-x: hidden;
+        }
+        
+        .container {
+            background: rgba(0, 0, 0, 0.8);
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            width: 90%;
+            max-width: 600px;
+            padding: 30px;
+            margin-top: 30px;
+            position: relative;
+            z-index: 2;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            padding-bottom: 20px;
+        }
+        
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            color: #ff6b6b;
+            text-shadow: 0 0 10px rgba(255, 107, 107, 0.7);
+        }
+        
+        .subtitle {
+            color: #aaa;
+            font-size: 1.1rem;
+            margin-bottom: 15px;
+        }
+        
+        .pen-icon {
+            font-size: 3rem;
+            color: #ff6b6b;
+            margin-bottom: 20px;
+        }
+        
+        .form-group {
+            margin-bottom: 25px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #ffd166;
+        }
+        
+        select, input {
+            width: 100%;
+            padding: 15px;
+            border-radius: 8px;
+            border: none;
+            background: rgba(50, 50, 50, 0.7);
+            color: white;
+            font-size: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s;
+        }
+        
+        select:focus, input:focus {
+            outline: none;
+            border-color: #ff6b6b;
+            box-shadow: 0 0 10px rgba(255, 107, 107, 0.5);
+        }
+        
+        button {
+            background: linear-gradient(to right, #ff6b6b, #ff8e53);
+            color: white;
+            border: none;
+            padding: 16px 30px;
+            font-size: 18px;
+            font-weight: bold;
+            border-radius: 8px;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 10px;
+            transition: all 0.3s;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+        
+        button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(255, 107, 107, 0.4);
+        }
+        
+        button:active {
+            transform: translateY(0);
+        }
+        
+        .result-container {
+            display: none;
+            background: rgba(30, 30, 30, 0.9);
+            border-radius: 10px;
+            padding: 25px;
+            margin-top: 30px;
+            text-align: center;
+            animation: fadeIn 0.5s;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .unlock-code {
+            font-size: 3.5rem;
+            font-weight: bold;
+            letter-spacing: 5px;
+            color: #4ecdc4;
+            margin: 25px 0;
+            text-shadow: 0 0 15px rgba(78, 205, 196, 0.7);
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        
+        .download-btn {
+            background: linear-gradient(to right, #4ecdc4, #1a936f);
+            margin-top: 20px;
+        }
+        
+        .loader {
+            display: none;
+            text-align: center;
+            margin: 30px 0;
+        }
+        
+        .spinner {
+            border: 5px solid rgba(255, 255, 255, 0.1);
+            border-top: 5px solid #ff6b6b;
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .status-text {
+            color: #aaa;
+            font-style: italic;
+        }
+        
+        .pen-particles {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+        
+        .pen-particle {
+            position: absolute;
+            font-size: 24px;
+            opacity: 0.3;
+            color: #ff6b6b;
+        }
+        
+        .warning {
+            background: rgba(255, 107, 107, 0.2);
+            border-left: 4px solid #ff6b6b;
+            padding: 15px;
+            border-radius: 0 8px 8px 0;
+            margin: 20px 0;
+            font-size: 0.9rem;
+        }
+        
+        .step {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+        }
+        
+        .step-number {
+            background: #ff6b6b;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+            font-weight: bold;
+        }
+        
+        footer {
+            margin-top: 30px;
+            text-align: center;
+            color: #aaa;
+            font-size: 0.9rem;
+        }
+        
+        @media (max-width: 600px) {
+            .container {
+                padding: 20px;
+                width: 95%;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+            
+            .unlock-code {
+                font-size: 2.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="pen-particles" id="penParticles"></div>
+    
+    <div class="container">
+        <header>
+            <div class="pen-icon">
+                <i class="fas fa-pen-fancy"></i>
+            </div>
+            <h1>选择系统</h1>
+            <p class="subtitle">系统刷入</p>
+        </header>
+        
+        <div class="step">
+            <div class="step-number">1</div>
+            <div>选择系统</div>
+        </div>
+        
+        <div class="form-group">
+            <label for="bolt"><i class="fas fa-pen"></i>系统</label>
+            <select id="penModel">
+                <option value="">-- 请选择你要刷的系统 --</option>
+                <option value="晨光原生系统">晨光原生系统</option>
+                <option value="类原生">类原生</option>
+                <option value="澎湃OS1.0">澎湃OS1.0</option>
+                <option value="MIUI OS">MIUI OS</option>
+                <option value="三星巨能写系统">三星巨能写系统</option>
+                <option value="Arch Linux(无中文补丁)">Arch Linux(无中文补丁)</option>
+                <option value="Arch Linux(中文补丁)">Arch Linux(中文补丁)</option>
+                <option value="华为系统5.0">华为系统5.0</option>
+                <option value="显卡专用系统">显卡专用系统</option>
+                <option value="挖矿专用系统">挖矿专用系统</option>
+                <option value="Arch Linux(非常多的插件)">Arch Linux(非常多的插件)</option>
+                <option value="澎湃OS2.0">澎湃OS2.0</option>
+                <option value="澎湃OS3.0">澎湃OS3.0</option>
+            </select>
+        </div>
+        
+        <div class="step">
+            <div class="step-number">2</div>
+            <div>输入笔的条形码</div>
+        </div>
+        
+        <div class="form-group">
+            <label for="barcode"><i class="fas fa-barcode"></i> 条形码</label>
+            <input type="text" id="barcode" placeholder="输入笔身上的13位条形码">
+        </div>
+        
+        <div class="warning">
+            <i class="fas fa-exclamation-triangle"></i> 警告：更改系统时请先将Bootloader锁解锁
+        </div>
+        
+        <button id="unlockBtn">
+            <i class="fas fa-unlock-alt"></i> 刷入
+        </button>
+        
+        <div class="loader" id="loader">
+            <div class="spinner"></div>
+            <p class="status-text">正在刷入新系统</p>
+        </div>
+        
+        <div class="result-container" id="resultContainer">
+            <h2><i class="fas fa-key"></i> 您的笔成功刷入新系统:</h2>
+            <div class="unlock-code" id="unlockCode">------</div>
+                </div>
+        <footer>
+            <p>永久免费提供系统刷入服务</p>
+        </footer>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const unlockBtn = document.getElementById('unlockBtn');
+            const loader = document.getElementById('loader');
+            const resultContainer = document.getElementById('resultContainer');
+            const unlockCode = document.getElementById('unlockCode');
+            const downloadBtn = document.getElementById('downloadBtn');
+            const penModel = document.getElementById('penModel');
+            const barcode = document.getElementById('barcode');
+            const penParticles = document.getElementById('penParticles');
+            
+            // 创建动态笔粒子效果
+            function createPenParticles() {
+                const particlesCount = 30;
+                for (let i = 0; i < particlesCount; i++) {
+                    const particle = document.createElement('div');
+                    particle.classList.add('pen-particle');
+                    particle.innerHTML = '✒';
+                    particle.style.left = `${Math.random() * 100}%`;
+                    particle.style.top = `${Math.random() * 100}%`;
+                    particle.style.fontSize = `${Math.random() * 20 + 15}px`;
+                    particle.style.opacity = Math.random() * 0.3;
+                    particle.style.transform = `rotate(${Math.random() * 360}deg)`;
+                    penParticles.appendChild(particle);
+                }
+            }
+            
+            createPenParticles();
+            
+            // 生成随机6位解锁码
+            function generateUnlockCode() {
+                return Math.floor(100000 + Math.random() * 900000);
+            }
+            
+            // 解锁按钮点击事件
+            unlockBtn.addEventListener('click', function() {
+                if (!penModel.value) {
+                    alert('请选择您的笔型号！');
+                    return;
+                }
+                
+                if (!barcode.value || barcode.value.length < 5) {
+                    alert('请输入有效的条形码！');
+                    return;
+                }
+                
+                // 显示加载动画
+                unlockBtn.disabled = true;
+                loader.style.display = 'block';
+                resultContainer.style.display = 'none';
+                
+                // 模拟服务器请求延迟
+                setTimeout(function() {
+                    loader.style.display = 'none';
+                    
+                    // 生成并显示解锁码
+                    const code = generateUnlockCode();
+                    unlockCode.textContent = code;
+                    
+                    // 显示结果区域
+                    resultContainer.style.display = 'block';
+                    unlockBtn.disabled = false;
+                    
+                    // 保存到本地存储
+                    localStorage.setItem('lastUnlockCode', code);
+                    localStorage.setItem('lastPenModel', penModel.value);
+                }, 3000);
+            });
+            
+            // 下载按钮点击事件
+            downloadBtn.addEventListener('click', function() {
+                window.location.href = 'https://apps.microsoft.com/detail/9pnpt0f0f7xb?hl=zh-CN&gl=CN';
+            });
+            
+            // 尝试加载上次的解锁码
+            const lastUnlockCode = localStorage.getItem('lastUnlockCode');
+            const lastPenModel = localStorage.getItem('lastPenModel');
+            
+            if (lastUnlockCode && lastPenModel) {
+                penModel.value = lastPenModel;
+                unlockCode.textContent = lastUnlockCode;
+            }
+        });
+    </script>
+</body>
+</html>
